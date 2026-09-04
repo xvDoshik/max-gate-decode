@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="r_tcwduzvruxkl" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">#ffffffff</item>
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:statusBarColor">#ffffffff</item>
+        <item name="android:navigationBarColor">#ffffffff</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>

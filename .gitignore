@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+*.swp
+*.log
+
+unidbg/target/
+output/tmp_*.bin
+
+samples/*.apk
+.env
+.env.*
