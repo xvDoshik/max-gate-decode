@@ -1,6 +1,7 @@
 # Max Gate Tg 2.1.apk — полный разбор
 
-Источник: `/Users/xv/Downloads/AyuGram Desktop/Max Gate Tg 2.1.apk`  
+Источник: `Max Gate Tg 2.1.apk`  
+Канал распространения: [@getmaxtg](https://t.me/getmaxtg) (Max Gate Tg+Max)  
 SHA256: `fe01aafe9eabe4e2205816db3ed2ea5f086eb167220aa4fc6c37354fcd1dbef7`
 
 ## Вердикт
@@ -100,6 +101,7 @@ Runtime: `wgkqDvlG.a()` читает junk asset → `I2Wj0bzF` → `nativeCipher
 
 | Тип | URL / path |
 |-----|------------|
+| TG-канал (распространение) | [@getmaxtg](https://t.me/getmaxtg) |
 | Primary worker | `https://spring-bonus-4542.blackskripip.workers.dev` |
 | Onboarding WebView | `http://robloxprem.com/` (`OnboardingConfig.WEBVIEW_URL`, dex) |
 | WebSocket | `wss://.../cable` |
